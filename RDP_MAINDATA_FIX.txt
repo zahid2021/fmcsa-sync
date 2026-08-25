@@ -1,0 +1,42 @@
+RDP — Fix MainData.tsx (remove Chunks, one-file export)
+========================================================
+
+File on Anthony:
+  C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+
+Local ready copy (copy via USB/Drive if easier):
+  /home/zahid/PycharmProject/fmcsa_sync/frontend_patch/MainData.tsx
+
+--- A) Backup this one file first ---
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components
+copy MainData.tsx MainData.tsx.bak_20260824
+
+--- B) Open Notepad and replace ALL content ---
+notepad MainData.tsx
+  → Ctrl+A → Delete
+  → Paste full content from frontend_patch\MainData.tsx
+  → Ctrl+S → close
+
+OR PowerShell overwrite from a copied file:
+powershell -NoProfile -Command "Copy-Item -Force 'C:\fmcsa_sync\frontend_patch\MainData.tsx' 'C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx'"
+
+--- C) API must be running (export uses :8000) ---
+cd /d C:\fmcsa_sync
+call .venv\Scripts\activate.bat
+start "FMCSA API" cmd /k "cd /d C:\fmcsa_sync && call .venv\Scripts\activate.bat && python api_server.py"
+
+Check:
+curl http://127.0.0.1:8000/health
+
+--- D) Restart Vite ---
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_frontend
+npm run dev
+
+Browser: http://localhost:5173
+
+--- E) Video check ---
+1. Filter value TN, Header PHY_ST → Apply Filter
+2. Total Items should be ~79621 (full count)
+3. Table ~1000 rows; many pages OK
+4. NO Chunks dropdown
+5. Click "Export All (One File)" → downloads carriers_TN.csv (one file)

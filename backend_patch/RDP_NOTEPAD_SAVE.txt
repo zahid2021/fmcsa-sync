@@ -1,0 +1,60 @@
+============================================================
+RDP — SIRF NOTEPAD + CMD (copy/paste)
+Anthony RDP: C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+============================================================
+
+Local Cursor se file kholo → Ctrl+A → Ctrl+C
+RDP pe neeche CMD → Notepad khulega → Ctrl+A → Ctrl+V → Ctrl+S → band
+
+--------------------------------------------------------------
+FILE 1 — drive_cloud.py
+--------------------------------------------------------------
+CMD:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\drive_cloud.py
+
+Paste: local fmcsa_sync\backend_patch\drive_cloud.py (poora)
+Save: Ctrl+S
+
+--------------------------------------------------------------
+FILE 2 — drive_auth_once.py
+--------------------------------------------------------------
+CMD:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\drive_auth_once.py
+
+Paste: local fmcsa_sync\backend_patch\drive_auth_once.py (poora)
+Save: Ctrl+S
+
+--------------------------------------------------------------
+FILE 3 — run.py (backend)
+--------------------------------------------------------------
+CMD:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\run.py
+
+Paste: local fmcsa_sync\backend_patch\new_backend.py (poora — purana mita do)
+Save: Ctrl+S
+
+Agar unka main file backend.py hai to:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\backend.py
+(wahi new_backend.py paste)
+
+--------------------------------------------------------------
+FILE 4 — credentials.json (Google se download, phir Notepad)
+--------------------------------------------------------------
+Google Cloud se JSON download → open → Ctrl+A Ctrl+C
+CMD:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\credentials.json
+
+Paste → Ctrl+S
+(SETUP_DRIVE_CLOUD.txt = OAuth client kaise banate hain)
+
+--------------------------------------------------------------
+USKE BAAD — CMD (Notepad nahi)
+--------------------------------------------------------------
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib openpyxl
+python drive_auth_once.py
+python run.py
+
+Check:
+http://127.0.0.1:5000/export/drive/status
+============================================================

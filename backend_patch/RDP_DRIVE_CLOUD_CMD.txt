@@ -1,0 +1,28 @@
+============================================================
+RDP — Seedha Google Drive upload (Notepad → CMD)
+============================================================
+
+1) Local se RDP copy (fmsca_backend folder mein):
+   drive_cloud.py
+   drive_auth_once.py
+   new_backend.py  →  run.py / backend.py mein pura paste
+   credentials.json  (Google Cloud se — SETUP_DRIVE_CLOUD.txt)
+
+2) CMD paste:
+
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib openpyxl
+python drive_auth_once.py
+
+(Browser Allow — client Gmail)
+
+3) Flask restart:
+
+python run.py
+
+4) Check:
+http://127.0.0.1:5000/export/drive/status
+→ will_upload_to_cloud: true
+
+5) UI Export File → Drive web: FMCSA / {slug} / chunk_*.xlsx
+============================================================

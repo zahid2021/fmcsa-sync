@@ -1,0 +1,35 @@
+# Client / Anthony — OLD WAY ONLY (video 2026-08-24)
+
+Do NOT tell client to run `python new_backend.py`.
+`new_backend.py` is only a paste source once; everyday start = **run.py**.
+
+## One-time (after Cursor paste into new_backend.py)
+
+```bat
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+copy /Y new_backend.py run.py
+copy /Y new_backend.py backend.py
+```
+
+Or double-click: `START_OLD_WAY.bat` (copies then starts run.py).
+
+## Every day (what client uses)
+
+```bat
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+call env\Scripts\activate.bat
+python run.py
+```
+
+Window stays open → `http://127.0.0.1:5000`  
+Frontend: `http://localhost:5173`
+
+## Video checks (same old UI)
+
+1. Header **PHY_ST**, value **TN**, Apply → Total Items ~79621, ~1000 rows/page  
+2. Export → **one file**, no Chunks  
+3. Same start as before (`run.py`) — no new process for client  
+
+## If Total Items = 0 + “Flask band”
+
+`run.py` is not running. Start it (old way above). Do not use a different port or new_backend.py as the daily command.

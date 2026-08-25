@@ -1,0 +1,94 @@
+================================================================================
+FMCSA VIDEO FIX — RDP (Anthony) pe CMD se setup
+================================================================================
+
+PEHLE: Laptop se yeh 1 file RDP pe copy karo:
+  /home/zahid/PycharmProject/fmcsa_sync/INSTALL_VIDEO_FIX.ps1
+  → RDP pe save as:  C:\fmcsa_sync\INSTALL_VIDEO_FIX.ps1
+
+  (USB / WhatsApp / shared folder / Notepad paste — jo asaan ho)
+
+--------------------------------------------------------------------------------
+STEP A — files install (PowerShell / CMD)
+--------------------------------------------------------------------------------
+CMD kholo, yeh paste karo:
+
+mkdir C:\fmcsa_sync 2>nul
+cd /d C:\fmcsa_sync
+powershell -ExecutionPolicy Bypass -File C:\fmcsa_sync\INSTALL_VIDEO_FIX.ps1
+
+Expect: Wrote backup_for_client.py / export_one_file.py / api_server.py
+
+--------------------------------------------------------------------------------
+STEP B — Python venv + packages
+--------------------------------------------------------------------------------
+cd /d C:\fmcsa_sync
+
+REM agar .venv pehle se hai (history se) to skip create:
+if not exist .venv\Scripts\python.exe python -m venv .venv
+call .venv\Scripts\activate.bat
+python -m pip install -U pip
+pip install -r requirements_video.txt
+
+--------------------------------------------------------------------------------
+STEP C — .env check (MySQL password)
+--------------------------------------------------------------------------------
+REM agar .env pehle se hai to sirf verify karo:
+type .env
+
+REM agar nahi / galat hai, yeh banao (password apna dalo — pehle root tha):
+(
+echo MYSQL_HOST=127.0.0.1
+echo MYSQL_PORT=3306
+echo MYSQL_USER=root
+echo MYSQL_PASSWORD=root
+echo MYSQL_DATABASE=fmcsaaa
+echo MYSQL_TABLE=carrierinformation_csv
+echo FMCSA_WEBKEY=
+) > .env
+
+--------------------------------------------------------------------------------
+STEP D — CLIENT VIDEO #1: BACKUP pehle (Slack/email)
+--------------------------------------------------------------------------------
+cd /d C:\fmcsa_sync
+call .venv\Scripts\activate.bat
+python backup_for_client.py
+
+REM Frontend bhi zip karna ho (path apna):
+REM python backup_for_client.py --project-dir "C:\Users\Administrator\Desktop\fmsca"
+
+dir backups
+REM backups\*.zip + backups\*.sql  → Slack + email pe bhejo
+
+--------------------------------------------------------------------------------
+STEP E — CLIENT VIDEO #2: ONE file export (NO chunks) — TN example
+--------------------------------------------------------------------------------
+python export_one_file.py --phy-st TN --format csv --out C:\fmcsa_sync\exports
+dir C:\fmcsa_sync\exports
+
+--------------------------------------------------------------------------------
+STEP F — CLIENT VIDEO #3: API (page=1000 + one-file download)
+--------------------------------------------------------------------------------
+python api_server.py
+
+Browser pe test:
+  http://127.0.0.1:8000/docs
+  http://127.0.0.1:8000/api/carriers?phy_st=TN&page=1&limit=1000
+  http://127.0.0.1:8000/api/carriers/export?phy_st=TN
+
+UI (localhost:5173) ko is API se connect karna = FRONTEND_FIX.md
+(Chunks dropdown hatao, export URL upar wala use karo)
+
+--------------------------------------------------------------------------------
+TROUBLESHOOT
+--------------------------------------------------------------------------------
+pip fail / fastapi missing:
+  pip install fastapi uvicorn mysql-connector-python python-dotenv openpyxl
+
+mysqldump missing:
+  MySQL Workbench → Server → Data Export → fmcsaaa → Self-Contained File
+  Save into C:\fmcsa_sync\backups\
+
+MySQL access denied:
+  .env mein MYSQL_PASSWORD sahi karo (history mein kabhi TempPass123! / root)
+

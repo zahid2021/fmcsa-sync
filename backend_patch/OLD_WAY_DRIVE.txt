@@ -1,0 +1,46 @@
+============================================================
+OLD WAY ONLY — Anthony RDP (yaad rakhna)
+============================================================
+
+Roz ka start (SIRf ye):
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  call env\Scripts\activate.bat
+  python run.py
+
+Kabhi mat chalao:
+  python new_backend.py
+  python backend.py   (daily start ke liye)
+
+--------------------------------------------------------------
+Code update (Notepad) — ek dafa jab patch aaye
+--------------------------------------------------------------
+
+1) Notepad pe paste:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\new_backend.py
+  → local new_backend.py poora paste → Ctrl+S
+
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\drive_cloud.py
+  → local drive_cloud.py paste → Ctrl+S
+
+2) OLD entrypoints mein copy (CMD):
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+copy /Y new_backend.py run.py
+copy /Y new_backend.py backend.py
+
+3) Confirm:
+findstr /C:"export/drive" run.py
+
+4) Drive path (isi CMD window mein set — phir run.py):
+set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+
+5) Purana Flask Ctrl+C → OLD WAY start:
+call env\Scripts\activate.bat
+python run.py
+
+6) Check (doosra CMD):
+curl -s http://127.0.0.1:5000/export/drive/status
+  → JSON chahiye, 404 nahi
+
+7) UI Export → 
+dir "G:\My Drive\My Drive\FMCSA"
+============================================================

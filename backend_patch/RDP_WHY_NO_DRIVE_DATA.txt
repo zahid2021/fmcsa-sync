@@ -1,0 +1,46 @@
+============================================================
+RDP CMD — Drive pe data nahi aya? CHECK (copy/paste)
+============================================================
+
+1) Naya CMD (Flask is window mein NA chalaye):
+
+echo %FMCSA_DRIVE_ROOT%
+curl -s http://127.0.0.1:5000/export/drive/status
+dir "G:\My Drive\My Drive\FMCSA"
+dir "G:\My Drive\FMCSA"
+
+2) Samjho:
+
+echo khali / galat path
+  → Flask purane CMD se chal raha. Band karo, NAYA CMD, python run.py
+
+curl = 404 HTML
+  → run.py mein naya backend paste nahi / Flask restart nahi
+
+dir pe slug folder + chunk_1.xlsx dikhe
+  → Export OK. Browser sync wait / galat Gmail login
+
+dir pe kuch nahi
+  → Export is path pe nahi gaya. UI se dubara Export + filter + slug
+
+3) Browser Drive:
+start https://drive.google.com/drive/home
+  → WAHI Gmail se login jo Drive desktop pe hai
+  → My Drive → FMCSA
+
+4) Agar G: pe files hain, browser pe nahi:
+  - Taskbar Google Drive icon → sync chal raha?
+  - Stream vs Mirror: settings mein "Mirror files" try
+  - 2-5 min wait
+
+5) Force same path + restart:
+
+setx FMCSA_DRIVE_ROOT "G:\My Drive\My Drive\FMCSA"
+  (phir NAYA CMD)
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+echo %FMCSA_DRIVE_ROOT%
+python run.py
+
+UI: filter PHY_ST = HI (chota test) + slug test2 + Export File
+dir "G:\My Drive\My Drive\FMCSA\test2"
+============================================================

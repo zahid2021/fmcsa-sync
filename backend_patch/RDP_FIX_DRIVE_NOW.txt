@@ -1,0 +1,53 @@
+============================================================
+RDP NOTEPAD + CMD — Drive save nahi ho raha? CHECK
+============================================================
+
+Pehle ye CMD paste karo (Flask chal raha ho):
+
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+dir drive_cloud.py
+dir credentials.json
+dir token.json
+curl -s http://127.0.0.1:5000/export/drive/status
+
+Result samjho:
+  will_upload_to_cloud : true  → cloud Drive pe jana chahiye
+  will_upload_to_cloud : false → abhi LOCAL folder pe hi likh raha
+                                 (Desktop\FMCSA_Drive) — drive.google.com pe NAHI
+
+Agar credentials.json MISSING hai → cloud kabhi nahi chalega.
+Agar token.json MISSING hai → pehle: python drive_auth_once.py
+
+--------------------------------------------------------------
+ASAN RAH (Google Drive desktop — OAuth Cloud Console ke baghair)
+Client Gmail se RDP pe Drive app login → sync folder = real Drive
+--------------------------------------------------------------
+
+1) Browser RDP pe open:
+   https://www.google.com/drive/download/
+   Google Drive for desktop install → client Gmail login
+   Wait jab tak "My Drive" folder dikhe (File Explorer)
+
+2) CMD — folder banao + path set:
+
+mkdir "C:\Users\Administrator\My Drive\FMCSA"
+setx FMCSA_DRIVE_ROOT "C:\Users\Administrator\My Drive\FMCSA"
+
+(Agar My Drive alag path pe ho, Explorer se path copy karke setx mein daalo)
+
+3) PURANA CMD BAND → NAYA CMD:
+
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+python run.py
+
+4) UI: filter + slug + Export File
+
+5) Check:
+   Explorer: My Drive\FMCSA\{slug}\chunk_1.xlsx
+   Browser: https://drive.google.com → same FMCSA folder (sync ke baad)
+
+--------------------------------------------------------------
+UI pe kya dikhe:
+  [GOOGLE DRIVE OK]  = cloud / sync theek
+  [LOCAL ONLY]       = abhi Desktop\FMCSA_Drive — Drive web khali
+============================================================

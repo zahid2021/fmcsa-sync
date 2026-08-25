@@ -1,0 +1,84 @@
+============================================================
+SEEDHA GOOGLE DRIVE (CLOUD) — Export File upload
+RDP pe Notepad + CMD — Anthony RDP
+============================================================
+
+Problem:
+  Browser Drive (drive.google.com) local folder NAHI hai.
+  Isliye pehle Desktop\FMCSA_Drive pe likhta tha.
+  Ab API se seedha cloud Drive / FMCSA / slug pe upload hoga.
+
+--------------------------------------------------------------
+STEP A — Google Cloud pe OAuth client (laptop browser, 5 min)
+  Client Gmail se login: salesmonsterai.klozr@gmail.com
+--------------------------------------------------------------
+
+1) Browser: https://console.cloud.google.com/
+2) Project banao (ya select): FMCSA-Export
+3) Left menu: APIs & Services → Library
+4) Search: Google Drive API → ENABLE
+5) APIs & Services → OAuth consent screen
+   - User Type: External → Create
+   - App name: FMCSA Export
+   - User support email: apna Gmail
+   - Developer contact: apna Gmail
+   - Save
+   - Audience / Test users → ADD USER:
+     salesmonsterai.klozr@gmail.com
+6) APIs & Services → Credentials → CREATE CREDENTIALS
+   → OAuth client ID
+   - Application type: Desktop app
+   - Name: FMCSA RDP
+   - Create
+7) Download JSON → rename file to: credentials.json
+
+--------------------------------------------------------------
+STEP B — RDP pe files copy (Notepad nahi — file copy)
+--------------------------------------------------------------
+
+Copy these into:
+  C:\Users\Administrator\Desktop\fmsca\fmsca_backend\
+
+  - credentials.json     (Google se download)
+  - drive_cloud.py       (local patch se)
+  - drive_auth_once.py   (local patch se)
+  - new_backend.py → pehle se run.py / backend.py mein paste
+
+--------------------------------------------------------------
+STEP C — RDP CMD (Notepad mein type, CMD mein paste)
+--------------------------------------------------------------
+
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib openpyxl
+python drive_auth_once.py
+
+→ Browser khulega → client Gmail login → Allow
+→ token.json banega
+→ Flask band karke dobara:
+
+python run.py
+
+--------------------------------------------------------------
+STEP D — Test
+--------------------------------------------------------------
+
+UI: filter PHY_ST = TN
+Slug: test
+Export File
+
+Success msg ke baad laptop / RDP pe:
+  https://drive.google.com → My Drive → FMCSA → test → chunk_1.xlsx …
+
+Check API:
+  http://127.0.0.1:5000/export/drive/status
+
+  "drive_api_ready": true  hona chahiye
+
+--------------------------------------------------------------
+NOTES
+--------------------------------------------------------------
+- Password Drive API mein use NAHI hota — sirf browser Allow.
+- credentials.json + token.json secret hain — share mat karna.
+- Agar API setup mushkil ho: Google Drive for desktop install
+  + FMCSA_DRIVE_ROOT = My Drive\FMCSA (sync path).
+============================================================

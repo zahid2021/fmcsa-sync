@@ -1,0 +1,59 @@
+========================================
+  RDP: Google Drive + Excel export (e2e)
+========================================
+
+Client video ask:
+  - Login Drive with client Gmail/password
+  - Folder: My Drive\FMCSA
+  - Export File + slug -> FMCSA\{slug}\chunk_1.xlsx (10,000 rows each)
+  - Download File = one local file (already working)
+
+NOTE: App cannot type Gmail password for you.
+      You login once in Google Drive desktop; files sync automatically.
+
+----- A) Drive login + folder -----
+1) RDP pe Google Drive for desktop install/open
+2) Client email + password se login
+3) Desktop pe yeh bat paste/run:
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\SETUP_GOOGLE_DRIVE.bat
+
+   Linux se copy:
+   /home/zahid/PycharmProject/fmcsa_sync/backend_patch/SETUP_GOOGLE_DRIVE.bat
+
+4) Bat My Drive dhoondhegi, FMCSA folder banayegi, setx FMCSA_DRIVE_ROOT
+
+----- B) Backend (Excel + Drive) -----
+CMD:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  notepad new_backend.py
+
+Paste full:
+  /home/zahid/PycharmProject/fmcsa_sync/backend_patch/new_backend.py
+
+Then:
+  copy /Y new_backend.py run.py
+  copy /Y new_backend.py backend.py
+  python -m pip install openpyxl
+  python run.py
+
+CLOSE old CMD first, OPEN NEW CMD after setx so env loads:
+  python run.py
+
+Check:
+  curl -s http://127.0.0.1:5000/export/drive/status
+
+----- C) Live test -----
+  notepad ...\TEST_DRIVE_EXPORT.bat
+  (paste from backend_patch\TEST_DRIVE_EXPORT.bat)
+  Run it.
+
+OR browser UI:
+  Filter value HI, Header PHY_ST, Apply Filter
+  Slug name: test_user
+  Export File
+
+Expect folder:
+  ...\My Drive\FMCSA\test_user\chunk_1.xlsx, chunk_2.xlsx, ...
+
+Drive web (drive.google.com) pe same files sync ho jayengi.
+========================================

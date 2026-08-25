@@ -1,0 +1,41 @@
+========================================
+  NOTEPAD — UI + Drive export (3 files)
+========================================
+
+Desktop pe copies:
+  MainData.tsx / MainData.css / (backend below)
+
+----- 1) FRONTEND -----
+CMD on RDP:
+  notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+  notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+
+Linux se poori file copy → Notepad paste → Ctrl+S (UTF-8)
+
+----- 2) BACKEND -----
+Linux file:
+  /home/zahid/PycharmProject/fmcsa_sync/backend_patch/new_backend.py
+
+CMD on RDP:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  notepad new_backend.py
+
+Paste full file → Save, then:
+  copy /Y new_backend.py run.py
+  copy /Y new_backend.py backend.py
+  python run.py
+
+----- 3) GOOGLE DRIVE FOLDER -----
+Pehli baar folder banao (Drive desktop login ke baad):
+  mkdir "C:\Users\Administrator\Desktop\FMCSA_Drive\FMCSA"
+
+Ya Google Drive sync path set karo (CMD, same window pehle se):
+  set FMCSA_DRIVE_ROOT=C:\Users\Administrator\My Drive\FMCSA
+
+Export File → FMCSA\{slug}\chunk_1.csv, chunk_2.csv … (10k rows)
+
+----- CHECK -----
+Browser Ctrl+Shift+R
+Slug name type → Export File
+Download File = local one CSV
+========================================

@@ -1,0 +1,31 @@
+FULL DATA + chunked Excel (from client video 2026-08-24)
+=========================================================
+Video: TN filter → Total Items 79621 → Chunks → EXPORT TO EXCEL
+Official: TN≈79641, ALL USA≈4,490,646
+
+NO truncate. Upsert by DOT_NUMBER.
+
+------------------------------------------------------------
+A) Top up TN + export 8 Excel chunks (what video shows)
+------------------------------------------------------------
+cd /d C:\fmcsa_sync
+.venv\Scripts\activate
+pip install -r requirements.txt -q
+python verify_counts.py TN
+python import_census.py --from-api --phy-st TN
+python export_excel_chunks.py --phy-st TN --chunks 8 --out C:\fmcsa_sync\exports
+
+------------------------------------------------------------
+B) FULL USA census (~44.9 lakh — hours)
+------------------------------------------------------------
+python import_census.py --from-api
+
+If interrupted, resume:
+python import_census.py --from-api --start-offset 500000
+(use the next_offset printed in the last log line)
+
+------------------------------------------------------------
+C) Verify
+------------------------------------------------------------
+python verify_counts.py TN
+mysql -u root -proot fmcsaaa -e "SELECT COUNT(*) AS total, COUNT(DISTINCT DOT_NUMBER) AS unique_dots FROM carrierinformation_csv;"

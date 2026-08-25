@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.venv/
+.venv/
+.wenv/
+.stenv/
+env/
+venv/
+
+# Secrets / Drive OAuth
+credentials.json
+token.json
+**/credentials.json
+**/token.json
+
+# Large / local media (not source)
+*.wav
+*.mp4
+*.raw
+backups/
+exports/
+video_frames*/
+v0824/
+v0825/
+*.b64
+*.z64
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Install payloads / caches
+rdp_payload/
+install_parts/
+pocketsphinx_transcribe

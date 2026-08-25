@@ -1,0 +1,52 @@
+============================================================
+404 FIX — OLD WAY (Notepad + CMD only)
+============================================================
+
+A) run.py mein route hai ya nahi?
+---------------------------------
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+findstr /C:"export/drive" run.py
+findstr /C:"export/drive" backend.py
+findstr /C:"export/drive" new_backend.py
+
+Agar new_backend.py mein DIKHE lekin run.py mein NA DIKHE:
+  copy /Y new_backend.py run.py
+  copy /Y new_backend.py backend.py
+  findstr /C:"export/drive" run.py
+
+Agar new_backend.py mein BHI na dikhe → Notepad se pehle paste:
+
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\new_backend.py
+  (local new_backend.py poora Ctrl+A Ctrl+C → Notepad Ctrl+A Ctrl+V → Ctrl+S)
+
+phir:
+copy /Y new_backend.py run.py
+copy /Y new_backend.py backend.py
+
+B) Kaun sa Flask :5000 pe hai? (purana process)
+---------------------------------
+netstat -ano | findstr :5000
+
+Last column = PID. Us window ko Ctrl+C se band karo.
+Agar pata na chale kaunsi window:
+  tasklist | findstr python
+
+C) OLD WAY restart (isi order mein)
+---------------------------------
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+call env\Scripts\activate.bat
+set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+python run.py
+
+Start pe screen pe ye dikhna chahiye:
+  ROUTES: ... /export/drive ...
+  Drive cloud: ... local: G:\My Drive\...
+
+D) Doosra CMD — ab JSON aana chahiye
+---------------------------------
+curl -s http://127.0.0.1:5000/export/drive/status
+
+Agar phir 404:
+  findstr output (teen files) yahan paste karo
+  + python run.py start ki pehli 15 lines paste karo
+============================================================
