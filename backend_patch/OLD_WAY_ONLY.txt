@@ -30,6 +30,6 @@ Frontend: `http://localhost:5173`
 2. Export → **one file**, no Chunks  
 3. Same start as before (`run.py`) — no new process for client  
 
-## If Total Items = 0 + “Flask band”
+## If Total Items = 0 + Flask not running
 
 `run.py` is not running. Start it (old way above). Do not use a different port or new_backend.py as the daily command.

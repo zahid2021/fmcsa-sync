@@ -438,9 +438,8 @@ def export_to_drive():
             return jsonify({
                 "error": (
                     f"Cannot create folder: {folder} ({err}). "
-                    "Seedha Google Drive ke liye: SETUP_DRIVE_CLOUD.txt "
-                    "(credentials.json + python drive_auth_once.py). "
-                    "Ya Google Drive desktop install karke FMCSA_DRIVE_ROOT set karo."
+                    "Install Google Drive for desktop, set FMCSA_DRIVE_ROOT "
+                    "to My Drive\\FMCSA, or add credentials.json and run drive_auth_once.py."
                 ),
             }), 500
 
@@ -512,8 +511,8 @@ def export_to_drive():
         note = f"Uploaded to Google Drive: My Drive / FMCSA / {slug}"
     else:
         note = (
-            "Saved to local folder only (not cloud). "
-            "For direct Drive: SETUP_DRIVE_CLOUD.txt → credentials + drive_auth_once.py"
+            "Saved to Google Drive sync folder (FMCSA_DRIVE_ROOT). "
+            "Confirm Drive for desktop is syncing, or use credentials.json + drive_auth_once.py."
         )
 
     return jsonify({
@@ -554,11 +553,11 @@ def export_drive_status():
         "drive_api": cloud_info,
         "will_upload_to_cloud": use_cloud_drive(),
         "hint": (
-            "OK — Export File → Google Drive cloud (FMCSA/{slug})"
+            "OK — Export File uploads to Google Drive cloud (FMCSA/{slug})"
             if use_cloud_drive()
             else (
-                "Cloud upload OFF. Copy credentials.json + drive_cloud.py + "
-                "drive_auth_once.py, then: python drive_auth_once.py"
+                "Using local Drive sync folder. Optional API upload: "
+                "credentials.json + python drive_auth_once.py"
             )
         ),
     })

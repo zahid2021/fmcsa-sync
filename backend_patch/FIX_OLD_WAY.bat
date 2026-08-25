@@ -20,7 +20,7 @@ if exist new_backend.py (
 )
 
 echo.
-echo Ab PURANE tarike se start karo (jo pehle karte the).
+echo Start the usual way: call env\Scripts\activate.bat then python run.py
 echo Phir test:
 echo   curl -s -o NUL -w "HTTP %%{http_code}\n" "http://127.0.0.1:5000/export?filterkey=PHY_ST&filtervalue=TN"
 pause

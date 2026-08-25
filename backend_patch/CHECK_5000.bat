@@ -8,5 +8,5 @@ curl -s -o NUL -w "filter HTTP %{http_code}\n" "http://127.0.0.1:5000/filter/?fi
 echo === Export test ===
 curl -s -o NUL -w "export HTTP %{http_code}\n" "http://127.0.0.1:5000/export?filterkey=PHY_ST&filtervalue=TN"
 echo.
-echo Agar HTTP 000 / Connection refused = pehle python run.py chalao (window khuli).
+echo If HTTP 000 / Connection refused: start python run.py first (keep window open).
 pause

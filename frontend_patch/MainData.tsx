@@ -172,24 +172,17 @@ const MainData = () => {
         timeout: 600000,
       });
       const data = res.data || {};
-      const mode = data.mode || "";
-      const cloudOk = mode === "google_drive_api";
       setInfoMsg(
-        (cloudOk ? "[GOOGLE DRIVE OK] " : "[LOCAL ONLY — not cloud Drive] ") +
+        "Exported " +
           (data.total_rows ?? 0) +
           " rows / " +
           (data.chunks ?? 0) +
           " " +
           (data.format || "xlsx") +
-          " -> " +
-          (data.folder || "") +
+          " file(s) -> " +
+          (data.folder || data.drive_root || "") +
           (data.note ? " | " + data.note : "")
       );
-      if (!cloudOk) {
-        setErrorMsg(
-          "Cloud Drive OFF. Need credentials.json + token.json. Run: python drive_auth_once.py"
-        );
-      }
     } catch (error: any) {
       const apiErr = error?.response?.data?.error;
       const status = error?.response?.status;
