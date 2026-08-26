@@ -250,176 +250,192 @@ const MainData = () => {
   return (
     <div className="cdl-app">
       <div className="cdl-shell">
-        <header className="cdl-topbar">
-          <div className="cdl-brand">
-            <div className="cdl-brand-icon" aria-hidden="true">
-              🚛
+        <div className="cdl-hero-block">
+          <header className="cdl-topbar">
+            <div className="cdl-brand">
+              <div className="cdl-brand-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18 18.5a1.5 1.5 0 01-3 0 1.5 1.5 0 013 0m1.5-9h-5V7H6v2.5H4.5L3 12v5h1.05a2.5 2.5 0 014.9 0H15a2.5 2.5 0 014.9 0H21v-4.5M6 18.5a1.5 1.5 0 01-3 0 1.5 1.5 0 013 0M5 11h11V9H8V7h7v4" />
+                </svg>
+              </div>
+              <div>
+                <p className="cdl-brand-title">CDL Data Search</p>
+                <p className="cdl-brand-sub">FMCSA Carrier Database Search</p>
+              </div>
             </div>
-            <div>
-              <p className="cdl-brand-title">CDL Data Search</p>
-              <p className="cdl-brand-sub">FMCSA Carrier Database Search</p>
+            <div className="cdl-fmcsa-logo">
+              <div className="cdl-fmcsa-text">
+                <strong>FMCSA</strong>
+                Federal Motor Carrier
+                <br />
+                Safety Administration
+              </div>
+              <div className="cdl-fmcsa-shield" aria-hidden="true">
+                FMCSA
+              </div>
             </div>
-          </div>
-          <div className="cdl-fmcsa-badge">
-            <strong>FMCSA</strong>
-            Federal Motor Carrier
-            <br />
-            Safety Administration
-          </div>
-        </header>
+          </header>
 
-        <section className="cdl-hero" aria-label="Hero">
           <div className="cdl-hero-text">
-            <h2>
-              Search. Find. <em>Drive Safe.</em>
-            </h2>
+            <h1>
+              Search. Find. <span>Drive Safe.</span>
+            </h1>
             <p>
               Access FMCSA motor carrier data and compliance information with ease.
             </p>
           </div>
-        </section>
 
-        <section className="cdl-filters">
-          <div className="cdl-filters-head">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M10 18h4v-2h-4v2ZM3 6v2h18V6H3zm3 7h12v-2H6v2z"
-                fill="currentColor"
-              />
-            </svg>
-            Search Filters
-          </div>
+          <section className="cdl-filters">
+            <div className="cdl-filters-head">
+              <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M10 18h4v-2h-4v2ZM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                  fill="currentColor"
+                />
+              </svg>
+              Search Filters
+            </div>
 
-          <div className="cdl-fields">
-            <label className="cdl-field">
-              <span>Filter Value</span>
-              <input
-                type="text"
-                value={filterValue}
-                onChange={(e) => {
-                  setFilterValue(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="e.g. TN"
-              />
-            </label>
-            <label className="cdl-field">
-              <span>Start Date</span>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </label>
-            <label className="cdl-field">
-              <span>End Date</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </label>
-            <label className="cdl-field">
-              <span>Header</span>
-              <select
-                value={filterHeader}
-                onChange={(e) => setFilterHeader(e.target.value)}
+            <div className="cdl-fields-main">
+              <label className="cdl-field">
+                <span>Filter Value</span>
+                <input
+                  type="text"
+                  value={filterValue}
+                  onChange={(e) => {
+                    setFilterValue(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="e.g. TN"
+                />
+              </label>
+              <label className="cdl-field cdl-date-wrap">
+                <span>Start Date</span>
+                <input
+                  type="text"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  placeholder="yyyy-mm-dd"
+                />
+              </label>
+              <label className="cdl-field cdl-date-wrap">
+                <span>End Date</span>
+                <input
+                  type="text"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="yyyy-mm-dd"
+                />
+              </label>
+              <label className="cdl-field">
+                <span>Header</span>
+                <select
+                  value={filterHeader}
+                  onChange={(e) => setFilterHeader(e.target.value)}
+                >
+                  <option value="">Select header</option>
+                  {columns.map((column) => (
+                    <option key={column.id} value={column.id}>
+                      {column.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="cdl-field">
+                <span>Slug Name</span>
+                <input
+                  type="text"
+                  value={slugName}
+                  onChange={(e) => setSlugName(e.target.value)}
+                  placeholder="User name"
+                />
+              </label>
+            </div>
+
+            <div className="cdl-fields-export">
+              <label className="cdl-field">
+                <span>Start Number</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={exportStart}
+                  onChange={(e) => setExportStart(e.target.value)}
+                  placeholder="e.g. 1"
+                />
+              </label>
+              <label className="cdl-field">
+                <span>End Number</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={exportEnd}
+                  onChange={(e) => setExportEnd(e.target.value)}
+                  placeholder="e.g. 10000"
+                />
+              </label>
+              <div className="cdl-field" aria-hidden="true" />
+              <div className="cdl-field" aria-hidden="true" />
+              <div className="cdl-field" aria-hidden="true" />
+            </div>
+
+            <div className="cdl-actions">
+              <button
+                type="button"
+                className="cdl-btn cdl-btn-filter"
+                onClick={() => loadData(1, false)}
               >
-                <option value="">Select header</option>
-                {columns.map((column) => (
-                  <option key={column.id} value={column.id}>
-                    {column.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="cdl-field">
-              <span>Slug Name</span>
-              <input
-                type="text"
-                value={slugName}
-                onChange={(e) => setSlugName(e.target.value)}
-                placeholder="User name"
-              />
-            </label>
-            <label className="cdl-field">
-              <span>Start Number</span>
-              <input
-                type="number"
-                min={1}
-                value={exportStart}
-                onChange={(e) => setExportStart(e.target.value)}
-                placeholder="e.g. 1"
-              />
-            </label>
-            <label className="cdl-field">
-              <span>End Number</span>
-              <input
-                type="number"
-                min={1}
-                value={exportEnd}
-                onChange={(e) => setExportEnd(e.target.value)}
-                placeholder="e.g. 10000"
-              />
-            </label>
-          </div>
-
-          <div className="cdl-actions">
-            <button
-              type="button"
-              className="cdl-btn cdl-btn-filter"
-              onClick={() => loadData(1, false)}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M10 18h4v-2h-4v2ZM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-              </svg>
-              Apply Filter
-            </button>
-            <button
-              type="button"
-              className="cdl-btn cdl-btn-download"
-              onClick={downloadOneFile}
-              disabled={downloadLoading}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-              </svg>
-              {downloadLoading ? "..." : "Download File"}
-            </button>
-            <button
-              type="button"
-              className="cdl-btn cdl-btn-export"
-              onClick={exportToDrive}
-              disabled={exportLoading}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
-              </svg>
-              {exportLoading ? "..." : "Export File"}
-            </button>
-          </div>
-        </section>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M10 18h4v-2h-4v2ZM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                </svg>
+                Apply Filter
+              </button>
+              <button
+                type="button"
+                className="cdl-btn cdl-btn-download"
+                onClick={downloadOneFile}
+                disabled={downloadLoading}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                {downloadLoading ? "..." : "Download File"}
+              </button>
+              <button
+                type="button"
+                className="cdl-btn cdl-btn-export"
+                onClick={exportToDrive}
+                disabled={exportLoading}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                </svg>
+                {exportLoading ? "..." : "Export File"}
+              </button>
+            </div>
+          </section>
+        </div>
 
         <div className="cdl-stats">
           <div className="cdl-stat">
-            <span className="cdl-stat-icon blue">📄</span>
+            <span className="cdl-stat-ico doc">📄</span>
             <span>
               Total Items: <b>{Number(totalItems || 0).toLocaleString()}</b>
             </span>
           </div>
           <div className="cdl-stat">
-            <span className="cdl-stat-icon purple">📑</span>
+            <span className="cdl-stat-ico page">📑</span>
             <span>
               Page: <b>{currentPage}</b> / {totalPages || 1}
             </span>
           </div>
           <div className="cdl-stat">
-            <span className="cdl-stat-icon green">▦</span>
+            <span className="cdl-stat-ico rows">▦</span>
             <span>
               Rows: <b>{tableData.length}</b>
             </span>
           </div>
           <div className="cdl-stats-promo">
+            <div className="cdl-stats-promo-thumb" aria-hidden="true" />
             Your trusted source for FMCSA carrier data
           </div>
         </div>
