@@ -25,7 +25,7 @@ const MainData = () => {
   const [endDate, setEndDate] = useState("");
   const [slugName, setSlugName] = useState("");
   const [exportStart, setExportStart] = useState("1");
-  const [exportRowCount, setExportRowCount] = useState("10000");
+  const [exportEnd, setExportEnd] = useState("10000");
 
   const columns = useMemo(
     () =>
@@ -160,25 +160,25 @@ const MainData = () => {
       return;
     }
     const startRaw = exportStart.trim();
-    const countRaw = exportRowCount.trim();
-    if (!startRaw || !countRaw) {
-      setErrorMsg("Enter start number and row count.");
+    const endRaw = exportEnd.trim();
+    if (!startRaw || !endRaw) {
+      setErrorMsg("Enter start number and end number.");
       return;
     }
     const startNum = parseInt(startRaw, 10);
-    const rowCount = parseInt(countRaw, 10);
-    if (!Number.isFinite(startNum) || !Number.isFinite(rowCount)) {
-      setErrorMsg("Start and row count must be numbers.");
+    const endNum = parseInt(endRaw, 10);
+    if (!Number.isFinite(startNum) || !Number.isFinite(endNum)) {
+      setErrorMsg("Start and end must be numbers.");
       return;
     }
-    if (startNum < 1 || rowCount < 1) {
-      setErrorMsg("Start must be >= 1 and row count >= 1.");
+    if (startNum < 1 || endNum < startNum) {
+      setErrorMsg("Start must be >= 1 and end must be >= start.");
       return;
     }
-    const endNum = startNum + rowCount - 1;
+    const rowCount = endNum - startNum + 1;
     if (totalItems > 0 && endNum > totalItems) {
       setErrorMsg(
-        `Range ${startNum.toLocaleString()}-${endNum.toLocaleString()} exceeds total (${totalItems.toLocaleString()}).`
+        `End ${endNum.toLocaleString()} exceeds total (${totalItems.toLocaleString()}).`
       );
       return;
     }
@@ -189,7 +189,7 @@ const MainData = () => {
     }
     params.set("slug", slug);
     params.set("start_number", String(startNum));
-    params.set("row_count", String(rowCount));
+    params.set("end_number", String(endNum));
     setErrorMsg("");
     setInfoMsg("");
     setExportLoading(true);
@@ -199,30 +199,34 @@ const MainData = () => {
         timeout: 600000,
       });
       const data = res.data || {};
-      if (data.api_version !== undefined && data.api_version < 3) {
+      if (!data.api_version || data.api_version < 4) {
         setErrorMsg(
-          "Backend is outdated. Paste latest new_backend.py into run.py and restart."
+          "Backend outdated (no slice export). Paste new_backend.py, copy to run.py, restart Flask."
         );
+        return;
+      }
+      if (data.start_number === undefined || data.end_number === undefined) {
+        setErrorMsg("Backend did not apply start/end range. Update run.py on RDP.");
         return;
       }
       if (data.range_rows !== undefined && data.range_rows > rowCount) {
         setErrorMsg(
-          `Backend exported ${data.range_rows} rows but you asked for ${rowCount}. Update run.py.`
+          `Exported ${data.range_rows} rows but you asked for ${rowCount}. Update run.py.`
         );
         return;
       }
       setInfoMsg(
-        "Exported from row " +
+        "Exported rows " +
           (data.start_number ?? startNum) +
-          ", " +
-          (data.row_count ?? rowCount).toLocaleString() +
-          " rows (through row " +
-          (data.end_number ?? endNum).toLocaleString() +
-          ") / " +
+          "-" +
+          (data.end_number ?? endNum) +
+          " (" +
+          (data.range_rows ?? 0) +
+          " rows / " +
           (data.chunks ?? 0) +
           " " +
           (data.format || "xlsx") +
-          " file(s) -> " +
+          " file(s)) -> " +
           (data.folder || data.drive_root || "") +
           (data.note ? " | " + data.note : "")
       );
@@ -320,16 +324,16 @@ const MainData = () => {
                 min={1}
                 value={exportStart}
                 onChange={(e) => setExportStart(e.target.value)}
-                placeholder="e.g. 100001"
+                placeholder="e.g. 1"
               />
             </label>
             <label className="fmcsa-field">
-              <span>Row count</span>
+              <span>End number</span>
               <input
                 type="number"
                 min={1}
-                value={exportRowCount}
-                onChange={(e) => setExportRowCount(e.target.value)}
+                value={exportEnd}
+                onChange={(e) => setExportEnd(e.target.value)}
                 placeholder="e.g. 10000"
               />
             </label>

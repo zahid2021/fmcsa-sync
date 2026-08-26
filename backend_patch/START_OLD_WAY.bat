@@ -1,24 +1,29 @@
 @echo off
-title FMCSA — OLD WAY ONLY (run.py :5000)
+title FMCSA — OLD WAY (auto-copy + start)
 cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
 
-REM Keep run.py + backend.py in sync with the patched file (once after paste)
 if exist new_backend.py (
-  copy /Y new_backend.py run.py >nul
-  copy /Y new_backend.py backend.py >nul
+  copy /Y new_backend.py run.py
+  copy /Y new_backend.py backend.py
+  echo Copied new_backend.py -^> run.py
+) else (
+  echo WARNING: new_backend.py missing — paste patch first!
+)
+
+findstr /C:"export_api_version" run.py >nul
+if errorlevel 1 (
+  echo ERROR: run.py is OLD — no slice export. Paste new_backend.py first.
+  pause
+  exit /b 1
 )
 
 if exist env\Scripts\activate.bat (
   call env\Scripts\activate.bat
-) else if exist .venv\Scripts\activate.bat (
-  call .venv\Scripts\activate.bat
 )
 
-echo.
-echo === OLD WAY: python run.py on :5000 ===
-echo Keep this window OPEN. Browser = localhost:5173
-echo Filter: Header PHY_ST + value TN + Apply
-echo Export = one file (no Chunks)
+set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+echo FMCSA_DRIVE_ROOT=%FMCSA_DRIVE_ROOT%
+echo Export needs Start number + End number e.g. 1 to 10000
 echo.
 python run.py
 pause

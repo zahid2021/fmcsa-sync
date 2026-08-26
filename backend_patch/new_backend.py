@@ -317,7 +317,7 @@ def export_one_file():
 
 
 CHUNK_SIZE = 10000
-EXPORT_API_VERSION = 3  # 3 = start_number + row_count slice (max CHUNK_SIZE per file)
+EXPORT_API_VERSION = 4  # 4 = start_number + end_number slice, max 10k per file
 
 try:
     from openpyxl import Workbook
@@ -471,6 +471,20 @@ def export_to_drive():
     if not raw_slug:
         return jsonify({"error": "slug name is required"}), 400
     slug = safe_slug(raw_slug)
+
+    # Reject old-style "export everything" — slice params required first
+    has_start = bool((request.args.get("start_number") or request.args.get("start") or "").strip())
+    has_end = bool((request.args.get("end_number") or request.args.get("end") or "").strip())
+    has_count = bool(
+        (request.args.get("row_count") or request.args.get("count") or "").strip()
+    )
+    if not has_start or (not has_end and not has_count):
+        return jsonify({
+            "error": "start_number and end_number are required (e.g. start=1 end=10000)",
+            "api_version": EXPORT_API_VERSION,
+        }), 400
+
+    print(f"[export/drive] args={dict(request.args)}", flush=True)
 
     filterkey, filtervalue, start_date, end_date = filter_args()
     filterkey, filtervalue, _note = normalize_filter(filterkey, filtervalue)
