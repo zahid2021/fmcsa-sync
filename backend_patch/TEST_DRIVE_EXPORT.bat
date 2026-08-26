@@ -7,8 +7,8 @@ curl -s "http://127.0.0.1:5000/export/drive/status"
 echo.
 echo.
 
-echo Export test: PHY_ST=HI slug=test_user start=1 end=10000
-curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=HI&slug=test_user&start_number=1&end_number=10000"
+echo Export test: PHY_ST=HI slug=test_user start=1 row_count=10000
+curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=HI&slug=test_user&start_number=1&row_count=10000"
 echo.
 echo.
 

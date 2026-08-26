@@ -25,7 +25,7 @@ const MainData = () => {
   const [endDate, setEndDate] = useState("");
   const [slugName, setSlugName] = useState("");
   const [exportStart, setExportStart] = useState("");
-  const [exportEnd, setExportEnd] = useState("");
+  const [exportRowCount, setExportRowCount] = useState("");
 
   const columns = useMemo(
     () =>
@@ -160,23 +160,26 @@ const MainData = () => {
       return;
     }
     const startRaw = exportStart.trim();
-    const endRaw = exportEnd.trim();
-    if (!startRaw || !endRaw) {
-      setErrorMsg("Enter start number and end number.");
+    const countRaw = exportRowCount.trim();
+    if (!startRaw || !countRaw) {
+      setErrorMsg("Enter start number and row count.");
       return;
     }
     const startNum = parseInt(startRaw, 10);
-    const endNum = parseInt(endRaw, 10);
-    if (!Number.isFinite(startNum) || !Number.isFinite(endNum)) {
-      setErrorMsg("Start and end must be numbers.");
+    const rowCount = parseInt(countRaw, 10);
+    if (!Number.isFinite(startNum) || !Number.isFinite(rowCount)) {
+      setErrorMsg("Start and row count must be numbers.");
       return;
     }
-    if (startNum < 1 || endNum < startNum) {
-      setErrorMsg("Invalid range: start must be >= 1 and end >= start.");
+    if (startNum < 1 || rowCount < 1) {
+      setErrorMsg("Start must be >= 1 and row count >= 1.");
       return;
     }
+    const endNum = startNum + rowCount - 1;
     if (totalItems > 0 && endNum > totalItems) {
-      setErrorMsg(`End number exceeds total (${totalItems.toLocaleString()}).`);
+      setErrorMsg(
+        `Range ${startNum.toLocaleString()}-${endNum.toLocaleString()} exceeds total (${totalItems.toLocaleString()}).`
+      );
       return;
     }
     const { params } = buildFilterParams();
@@ -186,7 +189,7 @@ const MainData = () => {
     }
     params.set("slug", slug);
     params.set("start_number", String(startNum));
-    params.set("end_number", String(endNum));
+    params.set("row_count", String(rowCount));
     setErrorMsg("");
     setInfoMsg("");
     setExportLoading(true);
@@ -197,17 +200,17 @@ const MainData = () => {
       });
       const data = res.data || {};
       setInfoMsg(
-        "Exported rows " +
+        "Exported from row " +
           (data.start_number ?? startNum) +
-          "-" +
-          (data.end_number ?? endNum) +
-          " (" +
-          (data.total_rows ?? 0) +
-          " rows / " +
+          ", " +
+          (data.row_count ?? rowCount).toLocaleString() +
+          " rows (through row " +
+          (data.end_number ?? endNum).toLocaleString() +
+          ") / " +
           (data.chunks ?? 0) +
           " " +
           (data.format || "xlsx") +
-          " file(s)) -> " +
+          " file(s) -> " +
           (data.folder || data.drive_root || "") +
           (data.note ? " | " + data.note : "")
       );

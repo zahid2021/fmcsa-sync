@@ -1,31 +1,30 @@
 ============================================================
-RDP — Start / End range export (OLD WAY)
+RDP — Start + Row count export (client voice 26 Aug)
 ============================================================
 
-1) Notepad paste:
-notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\new_backend.py
-notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
-notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+Client wants ANY slice from filtered data:
+  Start 100001 + Row count 20000  -> rows 100001..120000 -> Google Drive
+  Start 400001 + Row count 50000 -> rows 400001..450000 -> Google Drive
+  Files: chunk_100001_110000.xlsx, chunk_110001_120000.xlsx (10k each)
 
-2) Copy to run.py:
-cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
-copy /Y new_backend.py run.py
-copy /Y new_backend.py backend.py
+NOT "export all filtered rows".
 
-3) Restart OLD WAY:
-call env\Scripts\activate.bat
-set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
-python run.py
+1) Notepad paste (local patches):
+   new_backend.py, MainData.tsx, MainData.css
 
-4) UI test:
+2) copy /Y new_backend.py run.py && backend.py
+
+3) OLD WAY restart:
+   call env\Scripts\activate.bat
+   set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+   python run.py
+
+4) Test:
    Filter PHY_ST = TN (Total ~79621)
    Slug: test
-   Start number: 1
-   End number: 10000
-   Export File -> Drive FMCSA\test\chunk_1.xlsx only
+   Start number: 10001
+   Row count: 10000
+   Export File -> Drive FMCSA\test\chunk_10001_20000.xlsx
 
-   Second test:
-   Start: 20001  End: 30000  -> 2 chunk files (10k each)
-
-Download File = still one full local file (unchanged).
+Download File = full filter download (unchanged).
 ============================================================

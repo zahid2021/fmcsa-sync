@@ -27,6 +27,8 @@ SELECT_COLS = (
     "PHY_CNTY,PHY_NATN,PHY_ST,PHY_STR,PHY_ZIP,TEL_NUM,created_at"
 )
 TABLE = "carrierinformation_csv"
+# Stable row order for export ranges (row 100001 = 100001st matching record)
+EXPORT_ORDER_BY = "DOT_NUMBER"
 
 # If user picks street/city/etc. but types a 2-letter state code, use PHY_ST
 GEO_MISTAKES = {
@@ -391,31 +393,63 @@ def safe_slug(raw):
 
 def parse_export_range(total_count):
     """
-    Export rows start_number..end_number (1-based, inclusive) from filtered set.
-    Example: 1-10000 = first 10k rows; 20000-30000 = rows 20k through 30k.
+    Pick any slice of filtered rows (1-based positions).
+
+    Client: start_number + row_count
+      e.g. start 100001, count 20000 -> rows 100001..120000
+      e.g. start 400001, count 50000 -> rows 400001..450000
+
+    Also accepts end_number (legacy): end must be >= start.
     """
     raw_start = (request.args.get("start_number") or request.args.get("start") or "").strip()
+    raw_count = (
+        request.args.get("row_count")
+        or request.args.get("count")
+        or request.args.get("number_of_rows")
+        or ""
+    ).strip()
     raw_end = (request.args.get("end_number") or request.args.get("end") or "").strip()
-    if not raw_start or not raw_end:
-        raise ValueError("start_number and end_number are required for Export File")
+
+    if not raw_start:
+        raise ValueError("start_number is required for Export File")
     try:
         start_num = int(raw_start)
-        end_num = int(raw_end)
     except ValueError:
-        raise ValueError("start_number and end_number must be integers")
+        raise ValueError("start_number must be an integer")
+
+    row_count = None
+    if raw_count:
+        try:
+            row_count = int(raw_count)
+        except ValueError:
+            raise ValueError("row_count must be an integer")
+    elif raw_end:
+        try:
+            end_num = int(raw_end)
+        except ValueError:
+            raise ValueError("end_number must be an integer")
+        if end_num < start_num:
+            raise ValueError("end_number must be >= start_number")
+        row_count = end_num - start_num + 1
+    else:
+        raise ValueError("row_count is required (how many rows to export from start)")
+
     if start_num < 1:
         raise ValueError("start_number must be at least 1")
-    if end_num < start_num:
-        raise ValueError("end_number must be >= start_number")
+    if row_count < 1:
+        raise ValueError("row_count must be at least 1")
     if total_count > 0 and start_num > total_count:
         raise ValueError(
             f"start_number ({start_num}) exceeds filtered total ({total_count})"
         )
+
+    end_num = start_num + row_count - 1
     if total_count > 0 and end_num > total_count:
         raise ValueError(
-            f"end_number ({end_num}) exceeds filtered total ({total_count})"
+            f"Range {start_num}-{end_num} exceeds filtered total ({total_count}). "
+            f"Max row_count from this start: {total_count - start_num + 1}"
         )
-    row_count = end_num - start_num + 1
+
     offset = start_num - 1
     return start_num, end_num, row_count, offset
 
@@ -424,10 +458,10 @@ def parse_export_range(total_count):
 @app.route("/export/drive/", methods=["GET"])
 def export_to_drive():
     """
-    Client: slug + start_number + end_number + Export File →
-    Google Drive / FMCSA / {slug} / chunk_1.xlsx… (10k rows per file).
+    Client: slug + start_number + row_count + Export File →
+    Google Drive / FMCSA / {slug} / chunk_{from}_{to}.xlsx (10k rows per file max).
 
-    Only exports the selected row range from filtered results (1-based inclusive).
+    Exports only the chosen slice from filtered results (any start, any count).
     """
     import shutil
     import tempfile
@@ -478,6 +512,12 @@ def export_to_drive():
     try:
         cur.execute(f"SELECT COUNT(*) FROM {TABLE} WHERE {where}", params)
         total = int(cur.fetchone()[0] or 0)
+        if total < 1:
+            cur.close()
+            conn.close()
+            if temp_dir:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+            return jsonify({"error": "No rows match this filter."}), 400
         try:
             start_num, end_num, row_count, offset = parse_export_range(total)
         except ValueError as e:
@@ -488,7 +528,8 @@ def export_to_drive():
             return jsonify({"error": str(e)}), 400
         query_params = list(params) + [row_count, offset]
         cur.execute(
-            f"SELECT {SELECT_COLS} FROM {TABLE} WHERE {where} LIMIT %s OFFSET %s",
+            f"SELECT {SELECT_COLS} FROM {TABLE} WHERE {where} "
+            f"ORDER BY {EXPORT_ORDER_BY} LIMIT %s OFFSET %s",
             query_params,
         )
     except mysql.connector.Error as err:
@@ -502,15 +543,15 @@ def export_to_drive():
     ext = "xlsx" if use_xlsx else "csv"
     files = []
     local_paths = []
-    chunk_idx = 0
     written = 0
     try:
         while True:
             batch = cur.fetchmany(CHUNK_SIZE)
             if not batch:
                 break
-            chunk_idx += 1
-            name = f"chunk_{chunk_idx}.{ext}"
+            chunk_from = start_num + written
+            chunk_to = chunk_from + len(batch) - 1
+            name = f"chunk_{chunk_from}_{chunk_to}.{ext}"
             path = os.path.join(folder, name)
             if use_xlsx:
                 write_chunk_xlsx(path, cols, batch)
@@ -518,7 +559,13 @@ def export_to_drive():
                 write_chunk_csv(path, cols, batch)
             written += len(batch)
             local_paths.append(path)
-            files.append({"name": name, "path": path, "rows": len(batch)})
+            files.append({
+                "name": name,
+                "path": path,
+                "rows": len(batch),
+                "from_row": chunk_from,
+                "to_row": chunk_to,
+            })
             print(f"[export/drive] wrote {path} rows={len(batch)}", flush=True)
     finally:
         cur.close()
@@ -563,6 +610,7 @@ def export_to_drive():
         "slug": slug,
         "start_number": start_num,
         "end_number": end_num,
+        "row_count": row_count,
         "range_rows": written,
         "folder": (
             upload_meta.get("drive_path")
