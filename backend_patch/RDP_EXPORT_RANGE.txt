@@ -1,0 +1,31 @@
+============================================================
+RDP — Start / End range export (OLD WAY)
+============================================================
+
+1) Notepad paste:
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_backend\new_backend.py
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+
+2) Copy to run.py:
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+copy /Y new_backend.py run.py
+copy /Y new_backend.py backend.py
+
+3) Restart OLD WAY:
+call env\Scripts\activate.bat
+set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+python run.py
+
+4) UI test:
+   Filter PHY_ST = TN (Total ~79621)
+   Slug: test
+   Start number: 1
+   End number: 10000
+   Export File -> Drive FMCSA\test\chunk_1.xlsx only
+
+   Second test:
+   Start: 20001  End: 30000  -> 2 chunk files (10k each)
+
+Download File = still one full local file (unchanged).
+============================================================

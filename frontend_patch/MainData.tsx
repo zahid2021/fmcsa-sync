@@ -24,6 +24,8 @@ const MainData = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [slugName, setSlugName] = useState("");
+  const [exportStart, setExportStart] = useState("");
+  const [exportEnd, setExportEnd] = useState("");
 
   const columns = useMemo(
     () =>
@@ -157,12 +159,34 @@ const MainData = () => {
       setErrorMsg("Enter slug name.");
       return;
     }
+    const startRaw = exportStart.trim();
+    const endRaw = exportEnd.trim();
+    if (!startRaw || !endRaw) {
+      setErrorMsg("Enter start number and end number.");
+      return;
+    }
+    const startNum = parseInt(startRaw, 10);
+    const endNum = parseInt(endRaw, 10);
+    if (!Number.isFinite(startNum) || !Number.isFinite(endNum)) {
+      setErrorMsg("Start and end must be numbers.");
+      return;
+    }
+    if (startNum < 1 || endNum < startNum) {
+      setErrorMsg("Invalid range: start must be >= 1 and end >= start.");
+      return;
+    }
+    if (totalItems > 0 && endNum > totalItems) {
+      setErrorMsg(`End number exceeds total (${totalItems.toLocaleString()}).`);
+      return;
+    }
     const { params } = buildFilterParams();
     if (!params.toString()) {
       setErrorMsg("Apply a filter first.");
       return;
     }
     params.set("slug", slug);
+    params.set("start_number", String(startNum));
+    params.set("end_number", String(endNum));
     setErrorMsg("");
     setInfoMsg("");
     setExportLoading(true);
@@ -173,13 +197,17 @@ const MainData = () => {
       });
       const data = res.data || {};
       setInfoMsg(
-        "Exported " +
+        "Exported rows " +
+          (data.start_number ?? startNum) +
+          "-" +
+          (data.end_number ?? endNum) +
+          " (" +
           (data.total_rows ?? 0) +
           " rows / " +
           (data.chunks ?? 0) +
           " " +
           (data.format || "xlsx") +
-          " file(s) -> " +
+          " file(s)) -> " +
           (data.folder || data.drive_root || "") +
           (data.note ? " | " + data.note : "")
       );
@@ -268,6 +296,26 @@ const MainData = () => {
                 value={slugName}
                 onChange={(e) => setSlugName(e.target.value)}
                 placeholder="User name"
+              />
+            </label>
+            <label className="fmcsa-field">
+              <span>Start number</span>
+              <input
+                type="number"
+                min={1}
+                value={exportStart}
+                onChange={(e) => setExportStart(e.target.value)}
+                placeholder="e.g. 1"
+              />
+            </label>
+            <label className="fmcsa-field">
+              <span>End number</span>
+              <input
+                type="number"
+                min={1}
+                value={exportEnd}
+                onChange={(e) => setExportEnd(e.target.value)}
+                placeholder="e.g. 10000"
               />
             </label>
           </div>

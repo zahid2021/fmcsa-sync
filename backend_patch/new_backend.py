@@ -389,15 +389,45 @@ def safe_slug(raw):
     return (s or "export")[:80]
 
 
+def parse_export_range(total_count):
+    """
+    Export rows start_number..end_number (1-based, inclusive) from filtered set.
+    Example: 1-10000 = first 10k rows; 20000-30000 = rows 20k through 30k.
+    """
+    raw_start = (request.args.get("start_number") or request.args.get("start") or "").strip()
+    raw_end = (request.args.get("end_number") or request.args.get("end") or "").strip()
+    if not raw_start or not raw_end:
+        raise ValueError("start_number and end_number are required for Export File")
+    try:
+        start_num = int(raw_start)
+        end_num = int(raw_end)
+    except ValueError:
+        raise ValueError("start_number and end_number must be integers")
+    if start_num < 1:
+        raise ValueError("start_number must be at least 1")
+    if end_num < start_num:
+        raise ValueError("end_number must be >= start_number")
+    if total_count > 0 and start_num > total_count:
+        raise ValueError(
+            f"start_number ({start_num}) exceeds filtered total ({total_count})"
+        )
+    if total_count > 0 and end_num > total_count:
+        raise ValueError(
+            f"end_number ({end_num}) exceeds filtered total ({total_count})"
+        )
+    row_count = end_num - start_num + 1
+    offset = start_num - 1
+    return start_num, end_num, row_count, offset
+
+
 @app.route("/export/drive", methods=["GET"])
 @app.route("/export/drive/", methods=["GET"])
 def export_to_drive():
     """
-    Client video: slug + Export File →
-    Google Drive / FMCSA / {slug} / chunk_1.xlsx… (10k rows).
+    Client: slug + start_number + end_number + Export File →
+    Google Drive / FMCSA / {slug} / chunk_1.xlsx… (10k rows per file).
 
-    Preferred: Google Drive API (credentials.json + token.json) → cloud upload.
-    Fallback: local Google Drive desktop sync folder (FMCSA_DRIVE_ROOT).
+    Only exports the selected row range from filtered results (1-based inclusive).
     """
     import shutil
     import tempfile
@@ -424,6 +454,7 @@ def export_to_drive():
     cols = [c.strip() for c in SELECT_COLS.split(",")]
     cloud = use_cloud_drive()
     temp_dir = None
+    start_num = end_num = None
     if cloud:
         temp_dir = tempfile.mkdtemp(prefix="fmcsa_drive_")
         folder = temp_dir
@@ -447,7 +478,19 @@ def export_to_drive():
     try:
         cur.execute(f"SELECT COUNT(*) FROM {TABLE} WHERE {where}", params)
         total = int(cur.fetchone()[0] or 0)
-        cur.execute(f"SELECT {SELECT_COLS} FROM {TABLE} WHERE {where}", params)
+        try:
+            start_num, end_num, row_count, offset = parse_export_range(total)
+        except ValueError as e:
+            cur.close()
+            conn.close()
+            if temp_dir:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+            return jsonify({"error": str(e)}), 400
+        query_params = list(params) + [row_count, offset]
+        cur.execute(
+            f"SELECT {SELECT_COLS} FROM {TABLE} WHERE {where} LIMIT %s OFFSET %s",
+            query_params,
+        )
     except mysql.connector.Error as err:
         cur.close()
         conn.close()
@@ -518,6 +561,9 @@ def export_to_drive():
     return jsonify({
         "ok": True,
         "slug": slug,
+        "start_number": start_num,
+        "end_number": end_num,
+        "range_rows": written,
         "folder": (
             upload_meta.get("drive_path")
             if upload_meta
