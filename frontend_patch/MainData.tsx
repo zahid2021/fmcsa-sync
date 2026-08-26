@@ -24,8 +24,8 @@ const MainData = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [slugName, setSlugName] = useState("");
-  const [exportStart, setExportStart] = useState("");
-  const [exportRowCount, setExportRowCount] = useState("");
+  const [exportStart, setExportStart] = useState("1");
+  const [exportRowCount, setExportRowCount] = useState("10000");
 
   const columns = useMemo(
     () =>
@@ -199,6 +199,18 @@ const MainData = () => {
         timeout: 600000,
       });
       const data = res.data || {};
+      if (data.api_version !== undefined && data.api_version < 3) {
+        setErrorMsg(
+          "Backend is outdated. Paste latest new_backend.py into run.py and restart."
+        );
+        return;
+      }
+      if (data.range_rows !== undefined && data.range_rows > rowCount) {
+        setErrorMsg(
+          `Backend exported ${data.range_rows} rows but you asked for ${rowCount}. Update run.py.`
+        );
+        return;
+      }
       setInfoMsg(
         "Exported from row " +
           (data.start_number ?? startNum) +
@@ -308,16 +320,16 @@ const MainData = () => {
                 min={1}
                 value={exportStart}
                 onChange={(e) => setExportStart(e.target.value)}
-                placeholder="e.g. 1"
+                placeholder="e.g. 100001"
               />
             </label>
             <label className="fmcsa-field">
-              <span>End number</span>
+              <span>Row count</span>
               <input
                 type="number"
                 min={1}
-                value={exportEnd}
-                onChange={(e) => setExportEnd(e.target.value)}
+                value={exportRowCount}
+                onChange={(e) => setExportRowCount(e.target.value)}
                 placeholder="e.g. 10000"
               />
             </label>

@@ -317,6 +317,7 @@ def export_one_file():
 
 
 CHUNK_SIZE = 10000
+EXPORT_API_VERSION = 3  # 3 = start_number + row_count slice (max CHUNK_SIZE per file)
 
 try:
     from openpyxl import Workbook
@@ -526,7 +527,12 @@ def export_to_drive():
             if temp_dir:
                 shutil.rmtree(temp_dir, ignore_errors=True)
             return jsonify({"error": str(e)}), 400
-        query_params = list(params) + [row_count, offset]
+        query_params = list(params) + [int(row_count), int(offset)]
+        print(
+            f"[export/drive] slice start={start_num} count={row_count} "
+            f"offset={offset} filter_total={total}",
+            flush=True,
+        )
         cur.execute(
             f"SELECT {SELECT_COLS} FROM {TABLE} WHERE {where} "
             f"ORDER BY {EXPORT_ORDER_BY} LIMIT %s OFFSET %s",
@@ -545,10 +551,13 @@ def export_to_drive():
     local_paths = []
     written = 0
     try:
-        while True:
-            batch = cur.fetchmany(CHUNK_SIZE)
+        while written < row_count:
+            need = min(CHUNK_SIZE, row_count - written)
+            batch = cur.fetchmany(need)
             if not batch:
                 break
+            if len(batch) > need:
+                batch = batch[:need]
             chunk_from = start_num + written
             chunk_to = chunk_from + len(batch) - 1
             name = f"chunk_{chunk_from}_{chunk_to}.{ext}"
@@ -566,7 +575,11 @@ def export_to_drive():
                 "from_row": chunk_from,
                 "to_row": chunk_to,
             })
-            print(f"[export/drive] wrote {path} rows={len(batch)}", flush=True)
+            print(
+                f"[export/drive] wrote {name} rows={len(batch)} "
+                f"total_written={written}/{row_count}",
+                flush=True,
+            )
     finally:
         cur.close()
         conn.close()
@@ -607,6 +620,7 @@ def export_to_drive():
 
     return jsonify({
         "ok": True,
+        "api_version": EXPORT_API_VERSION,
         "slug": slug,
         "start_number": start_num,
         "end_number": end_num,
@@ -645,6 +659,7 @@ def export_drive_status():
         "chunk_size": CHUNK_SIZE,
         "env_FMCSA_DRIVE_ROOT": (os.environ.get("FMCSA_DRIVE_ROOT") or "").strip() or None,
         "drive_api": cloud_info,
+        "export_api_version": EXPORT_API_VERSION,
         "will_upload_to_cloud": use_cloud_drive(),
         "hint": (
             "OK — Export File uploads to Google Drive cloud (FMCSA/{slug})"

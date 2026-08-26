@@ -1,0 +1,29 @@
+============================================================
+FIX: All data exporting instead of 10k slice
+============================================================
+
+Cause: old run.py on RDP (no LIMIT / no row_count) OR Row count = Total Items.
+
+1) Confirm backend version (must show export_api_version: 3):
+curl -s http://127.0.0.1:5000/export/drive/status
+
+2) Notepad + copy:
+notepad new_backend.py  -> paste local patch -> Save
+copy /Y new_backend.py run.py
+copy /Y new_backend.py backend.py
+
+3) Restart (NEW CMD):
+call env\Scripts\activate.bat
+python run.py
+
+4) UI defaults now:
+   Start number: 1
+   Row count: 10000   <- only this many rows go to Drive
+
+5) Test curl (must return range_rows: 10000 not 79621):
+curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=TN&slug=t&start_number=1&row_count=10000"
+
+Check "range_rows":10000 and one file chunk_1_10000.xlsx
+
+Do NOT put Total Items in Row count unless you want all rows.
+============================================================
