@@ -1,0 +1,19 @@
+FIX: Vite error hero-truck.jpg missing
+
+Cause: MainData.tsx was importing ../assets/hero-truck.jpg but file
+was not copied to RDP.
+
+Fix (already in local patches):
+- MainData.tsx NO LONGER imports any .jpg
+- MainData.css embeds truck image as base64 (works without assets folder)
+
+RDP steps:
+1. notepad ...\src\components\MainData.tsx
+   -> Ctrl+A Delete -> paste FULL local MainData.tsx -> Ctrl+S
+2. notepad ...\src\components\MainData.css
+   -> Ctrl+A Delete -> paste FULL local MainData.css -> Ctrl+S
+   (CSS is ~110KB because image is inside — paste whole file)
+3. Browser Ctrl+Shift+R
+
+Do NOT need to copy hero-truck.jpg anymore.
+Do NOT paste CSS into .tsx.

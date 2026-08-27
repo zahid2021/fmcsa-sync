@@ -1,0 +1,102 @@
+================================================================================
+FMCSA — PURA CODE RESTORE (History wala — Visible Start/End Export)
+================================================================================
+Date: Aug 27, 2026
+Client voice: Export row range Start + End number — VISIBLE (no collapsible)
+
+Local patch folder (laptop):
+  /home/zahid/PycharmProject/fmcsa_sync/
+
+================================================================================
+FILES — RDP pe paste / copy karo
+================================================================================
+
+FRONTEND (zaroori — dono files):
+  frontend_patch/MainData.tsx   (~43 KB)
+  frontend_patch/MainData.css   (~231 KB — hero + background embedded)
+
+  RDP paths:
+    C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+    C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+
+BACKEND (sirf agar run.py purana ho — tumhara v4 OK hai):
+  backend_patch/new_backend.py  → paste as new_backend.py, then:
+    copy /Y new_backend.py run.py
+    copy /Y new_backend.py backend.py
+
+BAT files (backend folder mein copy):
+  backend_patch/VERIFY_SLICE_EXPORT.bat
+  backend_patch/START_OLD_WAY.bat
+
+================================================================================
+UI LAYOUT (client voice — visible export range)
+================================================================================
+
+Filter Value | Start Date | End Date | Header | Slug Name
+─────────────────────────────────────────────────────────
+EXPORT ROW RANGE (START / END NUMBER)    ← clearly visible
+Start Number          End Number
+  default: 1            default: 10000
+─────────────────────────────────────────────────────────
+[Apply Filter]  [Download File]  [Export File]
+
+Export File behavior:
+  Start 1     + End 10000  → first 10k rows → Google Drive
+  Start 20000 + End 30000  → rows 20k–30k → Drive
+  Download File            → full filtered file local (unchanged)
+
+================================================================================
+RDP PASTE STEPS
+================================================================================
+
+1) Frontend TSX:
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+   Ctrl+A → Delete → poora MainData.tsx paste → Ctrl+S
+
+2) Frontend CSS (bada file — poora paste karo):
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+   Ctrl+A → Delete → poora MainData.css paste → Ctrl+S
+
+3) Browser hard refresh: Ctrl+Shift+R
+
+4) Backend check (already OK on your RDP):
+   findstr /C:"EXPORT_API_VERSION = 4" run.py
+
+5) Test slice export (Flask running):
+   VERIFY_SLICE_EXPORT.bat
+   Expected: "range_rows": 10000  (NOT 79621)
+
+================================================================================
+PURANA DAILY START (client — kuch naya nahi)
+================================================================================
+
+Backend:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  call env\Scripts\activate.bat
+  python run.py
+
+Frontend:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_frontend
+  npm run dev
+
+================================================================================
+LOCAL FILE CHECKLIST (laptop pe verify)
+================================================================================
+
+  [x] MainData.tsx — visible cdl-export-range (NO <details>)
+  [x] MainData.tsx — exportStart=1, exportEnd=10000 defaults
+  [x] MainData.tsx — CDL + FMCSA logos as <img>
+  [x] MainData.css — hero background base64
+  [x] MainData.css — responsive topbar + hero
+  [x] new_backend.py — EXPORT_API_VERSION = 4
+  [x] VERIFY_SLICE_EXPORT.bat
+  [x] START_OLD_WAY.bat
+
+================================================================================
+CURL TEST (manual)
+================================================================================
+
+curl -s http://127.0.0.1:5000/export/drive/status
+curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=HI&slug=verify&start_number=1&end_number=10000"
+
+================================================================================

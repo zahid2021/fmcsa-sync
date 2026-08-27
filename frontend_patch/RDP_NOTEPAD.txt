@@ -1,0 +1,47 @@
+FMCSA UI — SIRF NOTEPAD (koi PS1 / public folder NAHI)
+=======================================================
+
+Background + logos ab MainData.css ke ANDAR hain.
+Alag image copy ya INSTALL_HERO.ps1 ki zaroorat NAHI.
+
+RDP STEPS:
+----------
+
+1) MainData.tsx
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
+   → Ctrl+A → Delete
+   → laptop se poora MainData.tsx paste (~22 KB)
+   → Ctrl+S
+
+2) MainData.css  *** POORA FILE ***
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.css
+   → Ctrl+A → Delete
+   → laptop se poora MainData.css paste (~98 KB)
+   → Ctrl+S
+   → Save hone tak wait karo (1-2 sec)
+
+   WARNING: Agar aadha paste hua to background nahi aayegi.
+   File end mein yeh hona chahiye:
+     @media (min-width: 1600px) { ... }
+   (last closing brace)
+
+3) Browser hard refresh: Ctrl+Shift+R
+
+VERIFY:
+- Top: CDL logo left, FMCSA logo right
+- Background: truck + sunset — desktop + mobile dono par nazar aaye (F12 → resize test)
+- Export: Start Number 1, End Number 10000 visible
+
+Backend (purana tareeqa):
+  cd fmsca_backend
+  call env\Scripts\activate.bat
+  python run.py
+
+Frontend:
+  cd fmsca_frontend
+  npm run dev
+
+NOTEPAD TIPS:
+- Ek hi baar mein poora CSS paste karo (Ctrl+V)
+- Agar Notepad slow ho to VS Code / PyCharm se paste karo
+- Paste ke baad file size check: MainData.css ~100 KB+ honi chahiye

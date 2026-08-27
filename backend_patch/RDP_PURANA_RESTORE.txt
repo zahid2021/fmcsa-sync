@@ -1,0 +1,145 @@
+================================================================================
+FMCSA — PURANA TAREEQA RESTORE (Anthony RDP)
+================================================================================
+Client ko kuch naya seekhna nahi. Rozana wahi: python run.py + npm run dev
+
+Tumhara confirm: EXPORT_API_VERSION = 4 run.py mein hai — backend OK.
+
+================================================================================
+ROZANA START (pehle jaisa)
+================================================================================
+
+Backend — CMD kholo, band mat karo:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  call env\Scripts\activate.bat
+  python run.py
+  → http://127.0.0.1:5000
+
+Frontend — pehle jaisa:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_frontend
+  npm run dev
+  → http://localhost:5173
+
+Optional shortcut: double-click START_OLD_WAY.bat (backend folder mein)
+
+================================================================================
+BAT FILES — RDP pe banao (Notepad se)
+================================================================================
+
+--- File 1: VERIFY_SLICE_EXPORT.bat ---
+Path: C:\Users\Administrator\Desktop\fmsca\fmsca_backend\VERIFY_SLICE_EXPORT.bat
+
+@echo off
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+echo === run.py has slice export? ===
+findstr /C:"EXPORT_API_VERSION" run.py
+findstr /C:"parse_export_range" run.py
+echo.
+echo === API version (need export_api_version: 4) ===
+curl -s http://127.0.0.1:5000/export/drive/status
+echo.
+echo === Test 10k only (must show range_rows: 10000) ===
+curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=HI&slug=verify&start_number=1&end_number=10000"
+echo.
+pause
+
+--- File 2: START_OLD_WAY.bat ---
+Path: C:\Users\Administrator\Desktop\fmsca\fmsca_backend\START_OLD_WAY.bat
+
+@echo off
+title FMCSA — OLD WAY (auto-copy + start)
+cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+
+if exist new_backend.py (
+  copy /Y new_backend.py run.py
+  copy /Y new_backend.py backend.py
+  echo Copied new_backend.py -^> run.py
+) else (
+  echo WARNING: new_backend.py missing — paste patch first!
+)
+
+findstr /C:"export_api_version" run.py >nul
+if errorlevel 1 (
+  echo ERROR: run.py is OLD — no slice export. Paste new_backend.py first.
+  pause
+  exit /b 1
+)
+
+if exist env\Scripts\activate.bat (
+  call env\Scripts\activate.bat
+)
+
+set FMCSA_DRIVE_ROOT=G:\My Drive\My Drive\FMCSA
+echo FMCSA_DRIVE_ROOT=%FMCSA_DRIVE_ROOT%
+echo Export needs Start number + End number e.g. 1 to 10000
+echo.
+python run.py
+pause
+
+================================================================================
+SLICE EXPORT TEST (Flask chal raha ho)
+================================================================================
+
+Step 1 — Flask window:
+  cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_backend
+  call env\Scripts\activate.bat
+  python run.py
+  (Ctrl+C mat dabao — window open rakho)
+
+Step 2 — Doosri CMD:
+  curl -s http://127.0.0.1:5000/export/drive/status
+
+Expected:
+  {"export_api_version": 4, ...}
+
+Step 3 — Slice test:
+  curl -s "http://127.0.0.1:5000/export/drive?filterkey=PHY_ST&filtervalue=HI&slug=verify&start_number=1&end_number=10000"
+
+Expected response mein:
+  "range_rows": 10000   (79621 NAHI)
+  "start_number": 1
+  "end_number": 10000
+
+Ya: VERIFY_SLICE_EXPORT.bat
+
+================================================================================
+FRONTEND UI (CDL Data Search + Start/End export)
+================================================================================
+
+Notepad se paste karo:
+
+  MainData.tsx  →  ...\fmsca_frontend\src\components\MainData.tsx
+  MainData.css  →  ...\fmsca_frontend\src\components\MainData.css
+
+Local source: frontend_patch\MainData.tsx + MainData.css
+
+Browser: Ctrl+Shift+R
+
+UI mein naya:
+  - Start Number + End Number (Export row range)
+  - Export File = sirf woh range Google Drive pe
+  - Download File = poori filtered file (pehle jaisa)
+
+================================================================================
+BACKEND — sirf agar run.py purana ho (v4 nahi)
+================================================================================
+
+1) Notepad: new_backend.py paste (local: backend_patch\new_backend.py)
+2) copy /Y new_backend.py run.py
+   copy /Y new_backend.py backend.py
+3) Flask restart: python run.py
+
+Tumhara findstr already OK hai — yeh step skip kar sakte ho.
+
+================================================================================
+Kya NAHI badla (client ke liye)
+================================================================================
+
+  python run.py          → Same
+  Port 5000              → Same
+  UI localhost:5173      → Same
+  Filter → table         → Same
+  Download File          → Same (poori local file)
+  Google Drive export    → Same (+ Start/End range)
+
+================================================================================

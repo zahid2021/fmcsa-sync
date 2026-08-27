@@ -1,24 +1,14 @@
-FMCSA UI — paste on Anthony RDP (frontend only)
+FMCSA UI — Notepad only (no PS1, no public folder)
+==================================================
 
-Local files (Linux):
-  /home/zahid/PycharmProject/fmcsa_sync/frontend_patch/MainData.tsx
-  /home/zahid/PycharmProject/fmcsa_sync/frontend_patch/MainData.css
+Paste 2 files:
 
-RDP target folder:
+  MainData.tsx   (~22 KB)
+  MainData.css   (~104 KB — hero truck + logos INSIDE CSS)
+
+RDP:
   C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\
 
-Steps:
-1. Open MainData.tsx on Linux (or copy from chat/shared folder).
-2. On RDP: open Notepad → paste FULL MainData.tsx → Save as:
-   C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\src\components\MainData.tsx
-   (overwrite; encoding UTF-8)
-3. Same for MainData.css → Save as MainData.css in the SAME folder.
-4. Vite already running? Hard refresh browser (Ctrl+Shift+R).
-   Or restart: cd fmsca_frontend → npm run dev
-5. Check: brand title "FMCSA CARRIERS", soft teal UI, stats row, "Export All (One File)".
+Steps: see RDP_NOTEPAD.txt
 
-DO NOT paste Python / backend into MainData.tsx.
-
-Client video (2026-08-25) ask:
-  - UI should look better / professional
-  - Export = one file (not chunks) — already in this build
+Background is embedded in CSS — no INSTALL_HERO.ps1 needed.

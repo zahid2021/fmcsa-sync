@@ -1,0 +1,37 @@
+FMCSA UI images — ONE Notepad file (Anthony RDP)
+================================================
+
+Laptop file (open → Ctrl+A → Ctrl+C → paste ONCE in Notepad):
+  fmcsa_sync/frontend_patch/INSTALL_UI_IMAGES.ps1
+  (~134 KB — all 4 images inside)
+
+Creates:
+  src\assets\hero-truck.jpg
+  src\assets\hero-truck-thumb.jpg
+  src\assets\logo-cdl-brand.jpg
+  src\assets\logo-fmcsa-brand.jpg
+
+================================================
+RDP — 3 steps only
+================================================
+
+1) Notepad — paste ONCE, save:
+   notepad C:\Users\Administrator\Desktop\fmsca\fmsca_frontend\INSTALL_UI_IMAGES.ps1
+   (paste full file from laptop → Ctrl+S → close)
+
+2) CMD — run:
+   cd /d C:\Users\Administrator\Desktop\fmsca\fmsca_frontend
+   powershell -ExecutionPolicy Bypass -File INSTALL_UI_IMAGES.ps1
+
+   You should see 4 lines starting with OK:
+
+3) Browser hard refresh: Ctrl+Shift+R
+
+Also paste MainData.css (paths use /hero-truck.jpg from public folder).
+
+If images already in src\\assets only, run COPY_UI_IMAGES_TO_PUBLIC.bat once.
+
+Optional tiny BAT (type by hand, no big paste):
+   notepad INSTALL_UI_IMAGES.bat
+   paste from laptop INSTALL_UI_IMAGES.bat (3 lines)
+   double-click INSTALL_UI_IMAGES.bat
